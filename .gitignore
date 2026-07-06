@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+myenv/
+venv/
+env/
+
+# dbt
+target/
+dbt_packages/
+logs/
+*.duckdb
+*.db
+
+# Data
+data/raw/*.json
+data/processed/
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Airflow
+logs/
+plugins/
+config/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Keys & secrets
+keys/
+*.key
+*.pem
+*.json
+!keys/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spark
+derby.log
+metastore_db/

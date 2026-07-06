@@ -1,0 +1,138 @@
+version: 2
+
+models:
+  - name: stg_game
+    description: "Staging table cleaned from raw data, one row per game"
+    columns:
+      - name: game_id
+        description: "Unique game identifier (app_id)"
+        tests:
+          - unique
+          - not_null
+      - name: name
+        description: "Game title"
+        tests:
+          - not_null
+      - name: genres
+        description: "Array of genres"
+      - name: price
+        description: "Price in USD"
+        tests:
+          - not_null
+      - name: positive
+        description: "Number of positive reviews"
+        tests:
+          - not_null
+      - name: negative
+        description: "Number of negative reviews"
+        tests:
+          - not_null
+      - name: estimated_owners
+        description: "Estimated owner range (e.g., '20000 - 50000')"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['0 - 0', '0 - 20000', '20000 - 50000', '50000 - 100000',
+                       '100000 - 200000', '200000 - 500000', '500000 - 1000000',
+                       '1000000 - 2000000', '2000000 - 5000000', '5000000 - 10000000',
+                       '10000000 - 20000000', '20000000 - 50000000',
+                       '50000000 - 100000000', '100000000 - 200000000']
+      - name: release_date
+        description: "Release date (date type)"
+        tests:
+          - not_null
+      - name: release_year
+        description: "Extracted year from release_date"
+        tests:
+          - not_null
+          
+  - name: dim_game
+    description: "Dimension table for games"
+    columns:
+      - name: game_id
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_game')
+              field: game_id
+      - name: name
+        tests:
+          - not_null
+      - name: price
+        tests:
+          - not_null
+      - name: release_year
+        tests:
+          - not_null
+
+  - name: dim_genre
+    description: "Dimension table for unique genres"
+    columns:
+      - name: genre_id
+        tests:
+          - unique
+          - not_null
+      - name: genre_name
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_owners_tier
+    description: "Owner tier dimension (hard-coded)"
+    columns:
+      - name: tier_id
+        tests:
+          - unique
+          - not_null
+      - name: tier_label
+        tests:
+          - not_null
+      - name: range_min
+        tests:
+          - not_null
+      - name: range_max
+        tests:
+          - not_null
+
+  - name: bridge_game_genre
+    description: "Bridge table for many-to-many relationship between games and genres"
+    columns:
+      - name: game_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_game')
+              field: game_id
+      - name: genre_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_genre')
+              field: genre_id
+
+  - name: fact_game_stats
+    description: "Fact table with review counts and owner tier per game"
+    columns:
+      - name: fact_id
+        tests:
+          - unique
+          - not_null
+      - name: game_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_game')
+              field: game_id
+      - name: tier_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_owners_tier')
+              field: tier_id
+      - name: positive
+        tests:
+          - not_null
+      - name: negative
+        tests:
+          - not_null
