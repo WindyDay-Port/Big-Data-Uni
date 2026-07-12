@@ -7,7 +7,7 @@
 WITH genre_list AS (
     SELECT DISTINCT CAST(genre AS VARCHAR) AS genre_name
     FROM {{ ref('stg_game') }}
-    CROSS JOIN UNNEST(genres) AS genre
+    CROSS JOIN UNNEST(genres) AS t(genre)
     WHERE genres IS NOT NULL 
       AND ARRAY_LENGTH(genres) > 0 
       AND CAST(genre AS VARCHAR) != ''
